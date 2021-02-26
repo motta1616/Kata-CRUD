@@ -1,0 +1,5 @@
+/.idea/
+/back/.idea/
+/back/crud.iml
+/back/target/
+/front/node_modules/
