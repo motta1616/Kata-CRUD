@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.List;
 
 @Service
 public class TodoService {
@@ -11,7 +14,7 @@ public class TodoService {
     @Autowired
     private TodoRepository repository;
 
-    public Iterable<Todo> list(){
+    public List<Todo> list(){
         return repository.findAll();
     }
 
