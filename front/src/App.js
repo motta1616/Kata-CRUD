@@ -13,16 +13,30 @@ const Form = () => {
   const { dispatch, state: { todo } } = useContext(Store);
   const item = todo.item;
   const [state, setState] = useState(item);
+  const [error, setError] = useState(null)
+
+  const validForm = () =>{
+    let isValid =true;
+    setError(null)
+    if(state.name.length<3 || state.name.length>40 || state.name===null) {
+      setError("Debes ingresar tareas con mas de dos caracteres")
+      isValid = false
+    }
+    return isValid
+  }
 
   const onAdd = (event) => {
     event.preventDefault();
+
+    if (!validForm()){
+      return
+    };
 
     const request = {
       name: state.name,
       id: null,
       completed: false
     };
-
 
     fetch(HOST_API + "/todo", {
       method: "POST",
@@ -41,6 +55,10 @@ const Form = () => {
 
   const onEdit = (event) => {
     event.preventDefault();
+
+    if (!validForm()){
+      return
+    };
 
     const request = {
       name: state.name,
@@ -65,6 +83,11 @@ const Form = () => {
   }
 
   return <form ref={formRef}>
+    <div className=" alert-warning" role="alert">
+      {
+        error && <span>{error}</span>
+      }
+    </div>
     <div className="input-group mb-3">
     <input
       type="text"
