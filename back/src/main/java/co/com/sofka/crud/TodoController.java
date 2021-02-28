@@ -1,7 +1,12 @@
 package co.com.sofka.crud;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -10,20 +15,29 @@ public class TodoController {
     @Autowired
     private TodoService service;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @GetMapping(value = "api/todos")
-    public Iterable<Todo> list(){
-        return service.list();
+    public List<Dto> list(){
+        List<Todo> todos = service.list();
+        return todos.stream().map(this::convertToDto)
+                .collect(Collectors.toList());
     }
-    
+
     @PostMapping(value = "api/todo")
-    public Todo save(@RequestBody Todo todo){
-        return service.save(todo);
+    @ResponseBody
+    public Dto save( @RequestBody Dto todoDto) throws ParseException {
+        Todo todo = convertToEntity(todoDto);
+        Todo todoSaved = service.save(todo);
+        return convertToDto(todoSaved);
     }
 
     @PutMapping(value = "api/todo")
-    public Todo update(@RequestBody Todo todo){
+    public Dto update(@RequestBody Dto dataDto) throws ParseException {
+        Todo todo = convertToEntity(dataDto);
         if(todo.getId() != null){
-            return service.save(todo);
+            return convertToDto(service.save(todo));
         }
         throw new RuntimeException("No existe el id para actualziar");
     }
@@ -34,8 +48,16 @@ public class TodoController {
     }
 
     @GetMapping(value = "api/{id}/todo")
-    public Todo get(@PathVariable("id") Long id){
-        return service.get(id);
+    public Dto get(@PathVariable("id") Long id){
+        return convertToDto(service.get(id));
+    }
+
+    private Dto convertToDto(Todo todo) {
+        return modelMapper.map(todo, Dto.class);
+    }
+
+    private Todo convertToEntity(Dto todoDto) throws ParseException {
+        return modelMapper.map(todoDto, Todo.class);
     }
 
 }
